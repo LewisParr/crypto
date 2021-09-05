@@ -195,8 +195,16 @@ e = [exodusmoneyin exodusmoneyout];
 n = [nexomoneyin nexomoneyout];
 b = [binancemoneyin binancemoneyout];
 sumholdingvalues = sum(holdingvalues,2);
-h = [0 sumholdingvalues(end)];
-money = transpose([cb; sb; g; e; n; b; h]);
+% Manually add Coinbase Wallet
+cbw_manual = [0 0];
+% Manually add Gemini
+gem_manual = [100 0];
+% Manually add Ledger
+ledg_manual = [0 0];
+% Manually add Binance Liquid Swaps
+bls_manual = [0 0];
+h = [0 sumholdingvalues(end)+(20*0.726)+154.53+(47*0.726)+(1814.1989*0.726)];
+money = transpose([cb; sb; g; e; n; b; cbw_manual; gem_manual; ledg_manual; bls_manual; h]);
 b = bar(money, 'stacked');
 b(1).FaceColor = '#2b6dd1';
 b(2).FaceColor = '#70d12b';
@@ -204,8 +212,13 @@ b(3).FaceColor = '#2bbbd1';
 b(4).FaceColor = '#7e2bd1';
 b(5).FaceColor = '#110e60';
 b(6).FaceColor = '#d3c02c';
-b(7).FaceColor = '#d3562c';
-legend({'Coinbase','Swissborg','Guarda','Exodus','Nexo','Binance', 'Holdings'});
+b(7).FaceColor = '#3c2bd1';
+b(8).FaceColor = '#a4e9f2';
+b(9).FaceColor = '#808d8e';
+b(10).FaceColor = '#b25cb1';
+b(11).FaceColor = '#d3562c';
+legend({'Coinbase','Swissborg','Guarda','Exodus','Nexo','Binance','CB Wallet','Gemini','Ledger','B Liq Swaps','Holdings'});
 set(legend,'location','best');
 xticklabels({'In','Out'});
 ylabel('GBP');
+title('GBP In/Out');
