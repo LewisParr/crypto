@@ -11,5 +11,6 @@ moneyin = sum(moneyinamounts);
 % ...
 moneyout = 0;
 
+return
 end
 
