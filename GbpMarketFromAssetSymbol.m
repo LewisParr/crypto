@@ -13,6 +13,9 @@ elseif (assetSymbol=='ATOM')
     market = 'atomgbp';
 elseif (assetSymbol=='BNB')
     market = 'bnbgbp';
+elseif (assetSymbol=='BNBN')
+    % Nexo BNB
+    market = 'bnbgbp';
 elseif (assetSymbol=='ETH')
     market = 'ethgbp';
 elseif (assetSymbol=='ZRX')
@@ -99,6 +102,11 @@ elseif (assetSymbol=='GETH')
     % GETH historical prices are not available on CoinCodex, so use 
     % ETH instead
     market = 'ethgbp';
+elseif (assetSymbol=='NEXONEXO')
+    market = 'nexogbp';
+elseif (assetSymbol=='USD')
+    % Using USDC for USD conversions
+    market = 'usdcgbp';
 end
 
 return

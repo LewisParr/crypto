@@ -39,9 +39,18 @@ exodustotalvalue = sum(holdingvalues,2);
 exodusmoneyin = 0;
 exodusmoneyout = 0;
 
+%% Collect nexo
+TestNexoImport;
+nexodates = dates;
+nexoholdings = holdings;
+nexoholdingvalues = holdingvalues;
+nexototalvalue = sum(holdingvalues,2);
+nexomoneyin = moneyin;
+nexomoneyout = moneyout;
+
 %% Aggregate all transactions
 transactions = [coinbase_transactions; swissborg_transactions; ...
-    guarda_transactions; exodus_transactions];
+    guarda_transactions; exodus_transactions; nexo_transactions];
 transactions = sortrows(transactions,'Timestamp','ascend');
 
 %% Compute holdings over time
@@ -158,12 +167,13 @@ plot(coinbasedates, coinbasetotalvalue, 'Color', '#2b6dd1');
 plot(swissborgdates, swissborgtotalvalue, 'Color', '#70d12b');
 plot(guardadates, guardatotalvalue, 'Color', '#2bbbd1');
 plot(exodusdates, exodustotalvalue, 'Color', '#7e2bd1');
+plot(nexodates, nexototalvalue, 'Color', '#110e60');
 plot(dates, sum(holdingvalues,2), 'k');
 hold off
 title('Total Holding Value');
 xlabel('Date');
 ylabel('GBP');
-legend({'Coinbase','Swissborg','Guarda','Exodus','Total'});
+legend({'Coinbase','Swissborg','Guarda','Exodus','Nexo','Total'});
 set(legend,'location','best');
 
 nexttile(5);
@@ -171,10 +181,13 @@ cb = [coinbasemoneyin coinbasemoneyout];
 sb = [swissborgmoneyin swissborgmoneyout];
 g = [guardamoneyin guardamoneyout];
 e = [exodusmoneyin exodusmoneyout];
-money = transpose([cb; sb; g; e]);
+n = [nexomoneyin nexomoneyout];
+money = transpose([cb; sb; g; e; n]);
 b = bar(money, 'stacked');
 b(1).FaceColor = '#2b6dd1';
 b(2).FaceColor = '#70d12b';
-%xlim([1 2]);
-%xticklabels({'In','Out'});
-%ylabel('GBP');
+b(3).FaceColor = '#2bbbd1';
+b(4).FaceColor = '#7e2bd1';
+b(5).FaceColor = '#110e60';
+legend({'Coinbase','Swissborg','Guarda','Exodus','Nexo'});
+set(legend,'location','best');
