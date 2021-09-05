@@ -48,9 +48,19 @@ nexototalvalue = sum(holdingvalues,2);
 nexomoneyin = moneyin;
 nexomoneyout = moneyout;
 
+%% Collect binance;
+TestBinanceImport;
+binancedates = dates;
+binanceholdings = holdings;
+binanceholdingvalues = holdingvalues;
+binancetotalvalue = sum(holdingvalues,2);
+binancemoneyin = moneyin;
+binancemoneyout = moneyout;
+
 %% Aggregate all transactions
 transactions = [coinbase_transactions; swissborg_transactions; ...
-    guarda_transactions; exodus_transactions; nexo_transactions];
+    guarda_transactions; exodus_transactions; nexo_transactions; ...
+    binance_transactions];
 transactions = sortrows(transactions,'Timestamp','ascend');
 
 %% Compute holdings over time
@@ -126,7 +136,7 @@ d = 1;
 for a=1:length(assets)
     assetSymbol = assets(a);
     
-    if (assetSymbol=='GBP')
+    if (or(assetSymbol=='GBP',assetSymbol=='GBPX'))
         holdingvalues(:,a) = holdings(:,a);
     else
         market = GbpMarketFromAssetSymbol(assetSymbol);
@@ -168,12 +178,13 @@ plot(swissborgdates, swissborgtotalvalue, 'Color', '#70d12b');
 plot(guardadates, guardatotalvalue, 'Color', '#2bbbd1');
 plot(exodusdates, exodustotalvalue, 'Color', '#7e2bd1');
 plot(nexodates, nexototalvalue, 'Color', '#110e60');
+plot(binancedates, binancetotalvalue, 'Color', '#d3c02c');
 plot(dates, sum(holdingvalues,2), 'k');
 hold off
 title('Total Holding Value');
 xlabel('Date');
 ylabel('GBP');
-legend({'Coinbase','Swissborg','Guarda','Exodus','Nexo','Total'});
+legend({'Coinbase','Swissborg','Guarda','Exodus','Nexo','Binance','Total'});
 set(legend,'location','best');
 
 nexttile(5);
@@ -182,12 +193,19 @@ sb = [swissborgmoneyin swissborgmoneyout];
 g = [guardamoneyin guardamoneyout];
 e = [exodusmoneyin exodusmoneyout];
 n = [nexomoneyin nexomoneyout];
-money = transpose([cb; sb; g; e; n]);
+b = [binancemoneyin binancemoneyout];
+sumholdingvalues = sum(holdingvalues,2);
+h = [0 sumholdingvalues(end)];
+money = transpose([cb; sb; g; e; n; b; h]);
 b = bar(money, 'stacked');
 b(1).FaceColor = '#2b6dd1';
 b(2).FaceColor = '#70d12b';
 b(3).FaceColor = '#2bbbd1';
 b(4).FaceColor = '#7e2bd1';
 b(5).FaceColor = '#110e60';
-legend({'Coinbase','Swissborg','Guarda','Exodus','Nexo'});
+b(6).FaceColor = '#d3c02c';
+b(7).FaceColor = '#d3562c';
+legend({'Coinbase','Swissborg','Guarda','Exodus','Nexo','Binance', 'Holdings'});
 set(legend,'location','best');
+xticklabels({'In','Out'});
+ylabel('GBP');

@@ -107,6 +107,54 @@ elseif (assetSymbol=='NEXONEXO')
 elseif (assetSymbol=='USD')
     % Using USDC for USD conversions
     market = 'usdcgbp';
+elseif (assetSymbol=='VITE')
+    market = 'vitegbp';
+elseif (assetSymbol=='VET')
+    market = 'vetgbp';
+elseif (assetSymbol=='TLM')
+    market = 'tlmgbp';
+elseif (assetSymbol=='THETA')
+    market = 'thetagbp';
+elseif (assetSymbol=='VTHO')
+    market = 'vthogbp';
+elseif (assetSymbol=='XMR')
+    market = 'xmrgbp';
+elseif (assetSymbol=='PROM')
+    market = 'promgbp';
+elseif (assetSymbol=='SOL')
+    market = 'solgbp';
+elseif (assetSymbol=='MDX')
+    market = 'mdxgbp';
+elseif (assetSymbol=='MATIC')
+    market = 'maticgbp';
+elseif (assetSymbol=='KSM')
+    market = 'ksmgbp';
+elseif (assetSymbol=='KLAY')
+    market = 'klaygbp';
+elseif (assetSymbol=='INJ')
+    market = 'injgbp';
+elseif (assetSymbol=='ICP')
+    market = 'icpgbp';
+elseif (assetSymbol=='DOT')
+    market = 'dotgbp';
+elseif (assetSymbol=='DODO')
+    market = 'dodogbp';
+elseif (assetSymbol=='CAKE')
+    market = 'cakegbp';
+elseif (assetSymbol=='BUSD')
+    market = 'busdgbp';
+elseif (assetSymbol=='ATA')
+    market = 'atagbp';
+elseif (assetSymbol=='ARPA')
+    market = 'arpagbp';
+elseif (assetSymbol=='1INCH')
+    market = '1inchgbp';
+elseif (assetSymbol=='NEO')
+    market = 'neogbp';
+elseif (assetSymbol=='GAS')
+    market = 'gasgbp';
+elseif (assetSymbol=='DUSK')
+    market = 'duskgbp';
 end
 
 return
