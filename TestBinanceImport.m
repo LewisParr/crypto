@@ -16,6 +16,10 @@ binanceoutput = ImportAllBinanceData();
 exchangetransactions = ProcessBinanceExchanges(binanceoutput);
 % Note: have removed using absolute values of binance.Change
 
+%% Extract reward distribution/POS savings interest/savings interest/launchpool interest
+yieldtransactions = ProcessBinanceYields(binanceoutput);
+% Note: have removed using absolute values of binance.Change
+
 %% Extract commission history transactions
 misctransactions = ProcessBinanceMisc(binanceoutput);
 % Note: have removed using absolute values of binance.Change
@@ -23,33 +27,6 @@ misctransactions = ProcessBinanceMisc(binanceoutput);
 %% Prepare for extraction
 fromColumnNames = {'Var1','Var2','Var3','Var4','Var5','Var6','Var7','Var8','Var9','Var10','Var11','Var12','Var13'};
 toColumnNames = {'Timestamp','ToAsset','ToQuantity','ToRate','ToTotal','FeeAsset','FeeQuantity','FeeRate','FeeTotal','FromAsset','FromQuantity','FromRate','FromTotal'};
-
-%% Extract reward transaction data
-a = binanceoutput(binanceoutput.Operation=='Rewards Distribution',:);
-b = binanceoutput(binanceoutput.Operation=='POS savings interest',:);
-c = binanceoutput(binanceoutput.Operation=='Savings Interest',:);
-d = binanceoutput(binanceoutput.Operation=='Launchpool Interest',:);
-binanceyield = [a; b; c; d];
-noneAsset = strings(height(binanceyield),1);
-for i=1:height(binanceyield)
-    noneAsset(i) = "None";
-end
-noneAsset = categorical(noneAsset);
-yieldtransactions = table(...
-    binanceyield.UTC_Time,...
-    binanceyield.Coin,...
-    binanceyield.Change,...
-    NaN(size(noneAsset)),...
-    NaN(size(noneAsset)),...
-    noneAsset,...
-    zeros(size(noneAsset)),...
-    zeros(size(noneAsset)),...
-    zeros(size(noneAsset)),...
-    noneAsset,...
-    zeros(size(noneAsset)),...
-    zeros(size(noneAsset)),...
-    zeros(size(noneAsset)));
-yieldtransactions = renamevars(yieldtransactions,fromColumnNames,toColumnNames);
 
 %% Extract deposit transaction data
 binancedeposit = binanceoutput(binanceoutput.Operation=='Deposit',:);
