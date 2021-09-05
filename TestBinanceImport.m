@@ -3,33 +3,18 @@ addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data');
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data\Trading');
 
 %% Import all binance files
-binanceoutput202104 = ImportBinanceOutput('2021','04');
-binanceoutput202105 = ImportBinanceOutput('2021','05');
-binanceoutput202106 = ImportBinanceOutput('2021','06');
-binanceoutput202107 = ImportBinanceOutput('2021','07');
-binanceoutput202108 = ImportBinanceOutput('2021','08');
+binanceoutput = ImportAllBinanceData();
 
-%% Aggregate all binance files
-binanceoutput = [binanceoutput202104; binanceoutput202105; ...
-    binanceoutput202106; binanceoutput202107; binanceoutput202108];
-binanceoutput.UTC_Time.Format = 'yyyy-MM-dd HH:mm:ss';
+%% Get summary
+[dateLimits,transactionTypes,accounts,operations,assets] ...
+    = SummariseBinanceOutput(binanceoutput);
 
-clear binanceoutput202104 binanceoutput202105 binanceoutput202106 opts ...
-    binanceoutput202107 binanceoutput202108
-
-%% Get summaries 
-transactionTypes = unique(binanceoutput.Operation);
+%% Get crypto fund cashflow
+[moneyin,moneyout] = GetBinanceCashflow(binanceoutput);
 
 %% Prepare for extraction
 fromColumnNames = {'Var1','Var2','Var3','Var4','Var5','Var6','Var7','Var8','Var9','Var10','Var11','Var12','Var13'};
 toColumnNames = {'Timestamp','ToAsset','ToQuantity','ToRate','ToTotal','FeeAsset','FeeQuantity','FeeRate','FeeTotal','FromAsset','FromQuantity','FromRate','FromTotal'};
-
-%% Calculate total GBP in/out of binance
-moneyintransactions = binanceoutput(binanceoutput.Operation=='Deposit',:);
-moneyintransactions = moneyintransactions(moneyintransactions.Coin=='GBP',:);
-moneyinamounts = moneyintransactions.Change;
-moneyin = sum(moneyinamounts);
-moneyout = 0;
 
 %% Extract buy/sell/fee transaction data
 binancebuy = binanceoutput(binanceoutput.Operation=='Buy',:);
