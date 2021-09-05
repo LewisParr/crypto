@@ -33,6 +33,16 @@ transactiontypes = unique(swissborgoutput.Type);
 fromColumnNames = {'Var1','Var2','Var3','Var4','Var5','Var6','Var7','Var8','Var9','Var10','Var11','Var12','Var13'};
 toColumnNames = {'Timestamp','ToAsset','ToQuantity','ToRate','ToTotal','FeeAsset','FeeQuantity','FeeRate','FeeTotal','FromAsset','FromQuantity','FromRate','FromTotal'};
 
+%% Calculate total GBP in/out into coinbase
+moneyintransactions = swissborgoutput(swissborgoutput.Type=='Deposit',:);
+moneyintransactions = moneyintransactions(moneyintransactions.Currency=='GBP',:);
+moneyinamounts = moneyintransactions.GrossAmount;
+moneyin = sum(moneyinamounts);
+moneyouttransactions = swissborgoutput(swissborgoutput.Type=='Withdrawal',:);
+moneyouttransactions = moneyouttransactions(moneyouttransactions.Currency=='GBP',:);
+moneyoutamounts = moneyouttransactions.NetAmount;
+moneyout = sum(moneyoutamounts);
+
 %% Extract buy/sell transaction data
 swissborgbuy = swissborgoutput(swissborgoutput.Type=='Buy',:);
 % ... buy and sell are separate lines ...
@@ -80,6 +90,8 @@ selltransactions = renamevars(selltransactions,fromColumnNames,toColumnNames);
 
 %% Extract deposit transaction data
 swissborgdeposit = swissborgoutput(swissborgoutput.Type=='Deposit',:);
+% Remove deposits of GBP so that we have P&L
+swissborgdeposit = swissborgdeposit(swissborgdeposit.Currency~='GBP',:);
 noneAsset = strings(height(swissborgdeposit),1);
 for i=1:height(swissborgdeposit)
     noneAsset(i) = "None";
@@ -103,6 +115,8 @@ deposittransactions = renamevars(deposittransactions,fromColumnNames,toColumnNam
 
 %% Extract withdrawal transaction data
 swissborgwithdrawal = swissborgoutput(swissborgoutput.Type=='Withdrawal',:);
+% Remove GBP withdrawals because we removed GBP deposits
+swissborgwithdrawal = swissborgwithdrawal(swissborgwithdrawal.Currency~='GBP',:);
 noneAsset = strings(height(swissborgwithdrawal),1);
 for i=1:height(swissborgwithdrawal)
     noneAsset(i) = "None";

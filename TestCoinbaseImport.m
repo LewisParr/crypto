@@ -29,6 +29,12 @@ transactionTypes = unique(coinbaseoutput.TransactionType);
 fromColumnNames = {'Var1','Var2','Var3','Var4','Var5','Var6','Var7','Var8','Var9','Var10','Var11','Var12','Var13'};
 toColumnNames = {'Timestamp','ToAsset','ToQuantity','ToRate','ToTotal','FeeAsset','FeeQuantity','FeeRate','FeeTotal','FromAsset','FromQuantity','FromRate','FromTotal'};
 
+%% Calculate total GBP in/out into coinbase
+moneyintransactions = coinbaseoutput(coinbaseoutput.TransactionType=='Buy',:);
+moneyinamounts = moneyintransactions.GBPTotalinclusiveOfFees;
+moneyin = sum(moneyinamounts);
+moneyout = 0;
+
 %% Extract buy transaction data
 coinbasebuy = coinbaseoutput(coinbaseoutput.TransactionType=='Buy',:);
 gbpAsset = strings(height(coinbasebuy),1);

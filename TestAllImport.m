@@ -1,29 +1,43 @@
-%% Collect
+%% Initialise
+clf;
+clear;
+clc;
+
+%% Collect coinbase
 TestCoinbaseImport;
 coinbasedates = dates;
 coinbaseholdings = holdings;
 coinbaseholdingvalues = holdingvalues;
 coinbasetotalvalue = sum(holdingvalues,2);
+coinbasemoneyin = moneyin;
+coinbasemoneyout = moneyout;
 
+%% Collect swissborg
 TestSwissborgImport;
 swissborgdates = dates;
 swissborgholdings = holdings;
 swissborgholdingvalues = holdingvalues;
 swissborgtotalvalue = sum(holdingvalues,2);
+swissborgmoneyin = moneyin;
+swissborgmoneyout = moneyout;
 
+%% Collect guarda
 TestGuardaImport;
 guardadates = dates;
 guardaholdings = holdings;
 guardaholdingvalues = holdingvalues;
 guardatotalvalue = sum(holdingvalues,2);
+guardamoneyin = 0;
+guardamoneyout = 0;
 
+%% Collect exodus
 TestExodusImport;
 exodusdates = dates;
 exodusholdings = holdings;
 exodusholdingvalues = holdingvalues;
 exodustotalvalue = sum(holdingvalues,2);
-
-%totalvalue = coinbasetotalvalue + swissborgtotalvalue;
+exodusmoneyin = 0;
+exodusmoneyout = 0;
 
 %% Aggregate all transactions
 transactions = [coinbase_transactions; swissborg_transactions; ...
@@ -136,6 +150,9 @@ end
 
 %% Plot
 clf;
+tiledlayout(1, 5);
+
+nexttile([1 4]);
 hold on
 plot(coinbasedates, coinbasetotalvalue, 'Color', '#2b6dd1');
 plot(swissborgdates, swissborgtotalvalue, 'Color', '#70d12b');
@@ -148,3 +165,16 @@ xlabel('Date');
 ylabel('GBP');
 legend({'Coinbase','Swissborg','Guarda','Exodus','Total'});
 set(legend,'location','best');
+
+nexttile(5);
+cb = [coinbasemoneyin coinbasemoneyout];
+sb = [swissborgmoneyin swissborgmoneyout];
+g = [guardamoneyin guardamoneyout];
+e = [exodusmoneyin exodusmoneyout];
+money = transpose([cb; sb; g; e]);
+b = bar(money, 'stacked');
+b(1).FaceColor = '#2b6dd1';
+b(2).FaceColor = '#70d12b';
+%xlim([1 2]);
+%xticklabels({'In','Out'});
+%ylabel('GBP');
