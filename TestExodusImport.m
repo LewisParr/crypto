@@ -1,43 +1,41 @@
-%% Collect
-TestCoinbaseImport;
-coinbasedates = dates;
-coinbaseholdings = holdings;
-coinbaseholdingvalues = holdingvalues;
-coinbasetotalvalue = sum(holdingvalues,2);
+%% Add paths
+addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data');
+addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data\Trading');
 
-TestSwissborgImport;
-swissborgdates = dates;
-swissborgholdings = holdings;
-swissborgholdingvalues = holdingvalues;
-swissborgtotalvalue = sum(holdingvalues,2);
+%% Import exodus file
+% Set up the Import Options and import the data
+opts = delimitedTextImportOptions("NumVariables", 13);
 
-TestGuardaImport;
-guardadates = dates;
-guardaholdings = holdings;
-guardaholdingvalues = holdingvalues;
-guardatotalvalue = sum(holdingvalues,2);
+% Specify range and delimiter
+opts.DataLines = [2, Inf];
+opts.Delimiter = ",";
 
-TestExodusImport;
-exodusdates = dates;
-exodusholdings = holdings;
-exodusholdingvalues = holdingvalues;
-exodustotalvalue = sum(holdingvalues,2);
+% Specify column names and types
+opts.VariableNames = ["Timestamp", "ToAsset", "ToQuantity", "ToRate", "ToTotal", "FeeAsset", "FeeQuantity", "FeeRate", "FeeTotal", "FromAsset", "FromQuantity", "FromRate", "FromTotal"];
+opts.VariableTypes = ["datetime", "categorical", "double", "double", "double", "categorical", "double", "double", "double", "categorical", "double", "double", "double"];
 
-%totalvalue = coinbasetotalvalue + swissborgtotalvalue;
+% Specify file level properties
+opts.ExtraColumnsRule = "ignore";
+opts.EmptyLineRule = "read";
 
-%% Aggregate all transactions
-transactions = [coinbase_transactions; swissborg_transactions; ...
-    guarda_transactions; exodus_transactions];
-transactions = sortrows(transactions,'Timestamp','ascend');
+% Specify variable properties
+opts = setvaropts(opts, ["ToAsset", "FeeAsset", "FromAsset"], "EmptyFieldRule", "auto");
+opts = setvaropts(opts, "Timestamp", "InputFormat", "dd/MM/yyyy HH:mm");
+
+% Import the data
+exodus_transactions = readtable("C:\Users\lparr\Documents\MATLAB\crypto\Data\Trading\exodus_output.csv", opts);
+
+% Clear temporary variables
+clear opts
 
 %% Compute holdings over time
 % Get a list of all assets
 assets = categorical(sort(string(unique([...
-    unique(transactions.ToAsset);...
-    unique(transactions.FeeAsset);...
-    unique(transactions.FromAsset)]))));
+    unique(exodus_transactions.ToAsset);...
+    unique(exodus_transactions.FeeAsset);...
+    unique(exodus_transactions.FromAsset)]))));
 % Get a list of all transaction dates
-[y,m,d] = ymd(transactions.Timestamp);
+[y,m,d] = ymd(exodus_transactions.Timestamp);
 dates = datetime(y,m,d);
 dates.Format = 'dd/MM/yy';
 % Get a vector of all dates
@@ -64,9 +62,9 @@ for date=min(dates):max(dates)
     end
     
     % today's transactions
-    todayTransactions = transactions(...
-        transactions.Timestamp >= date & ...
-        transactions.Timestamp < (date+1),:);
+    todayTransactions = exodus_transactions(...
+        exodus_transactions.Timestamp >= date & ...
+        exodus_transactions.Timestamp < (date+1),:);
     
     % Iterate over assets
     for a=1:length(assets)
@@ -92,6 +90,10 @@ end
 % Clear temporary variables
 clear a d date m y todayTransactions toTransactions feeTransactions ...
     fromTransactions
+
+% Plot holdings over time
+clf;
+plot(dates, holdings);
 
 %% Calculate value of holdings over time
 % Construct array of holding value over time
@@ -134,17 +136,11 @@ for a=1:length(assets)
     end
 end
 
-%% Plot
+%% Plot total holding value over time
 clf;
-hold on
-plot(coinbasedates, coinbasetotalvalue, 'Color', '#2b6dd1');
-plot(swissborgdates, swissborgtotalvalue, 'Color', '#70d12b');
-plot(guardadates, guardatotalvalue, 'Color', '#2bbbd1');
-plot(exodusdates, exodustotalvalue, 'Color', '#7e2bd1');
-plot(dates, sum(holdingvalues,2), 'k');
-hold off
+plot(dates, sum(holdingvalues,2));
 title('Total Holding Value');
 xlabel('Date');
 ylabel('GBP');
-legend({'Coinbase','Swissborg','Guarda','Exodus','Total'});
-set(legend,'location','best');
+legend({'Guarda'});
+set(legend, 'location', 'best');
