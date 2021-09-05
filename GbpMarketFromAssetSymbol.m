@@ -81,6 +81,20 @@ elseif (assetSymbol=='AMP')
     market = 'ampgbp';
 elseif (assetSymbol=='CGLD')
     market = 'celogbp';
+elseif (assetSymbol=='CHSB')
+    market = 'chsbgbp';
+elseif (assetSymbol=='REN')
+    market = 'rengbp';
+elseif (assetSymbol=='ENJ')
+    market = 'enjgbp';
+elseif (assetSymbol=='UTK')
+    market = 'utkgbp';
+elseif (assetSymbol=='CHZ')
+    market = 'chzgbp';
+elseif (assetSymbol=='USDT')
+    market = 'usdtgbp';
+elseif (assetSymbol=='XRP')
+    market = 'xrpgbp';
 end
 
 return
