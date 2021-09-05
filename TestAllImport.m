@@ -11,6 +11,12 @@ swissborgholdings = holdings;
 swissborgholdingvalues = holdingvalues;
 swissborgtotalvalue = sum(holdingvalues,2);
 
+TestGuardaImport;
+guardadates = dates;
+guardaholdings = holdings;
+guardaholdingvalues = holdingvalues;
+guardatotalvalue = sum(holdingvalues,2);
+
 %totalvalue = coinbasetotalvalue + swissborgtotalvalue;
 
 %% Plot
@@ -18,10 +24,11 @@ clf;
 hold on
 plot(coinbasedates, coinbasetotalvalue);
 plot(swissborgdates, swissborgtotalvalue);
+plot(guardadates, guardatotalvalue);
 %plot(dates, totalvalue);
 hold off
 title('Total Holding Value');
 xlabel('Date');
 ylabel('GBP');
-legend({'Coinbase','Swissborg','Total'});
+legend({'Coinbase','Swissborg','Guarda','Total'});
 set(legend,'location','best');

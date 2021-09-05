@@ -95,6 +95,10 @@ elseif (assetSymbol=='USDT')
     market = 'usdtgbp';
 elseif (assetSymbol=='XRP')
     market = 'xrpgbp';
+elseif (assetSymbol=='GETH')
+    % GETH historical prices are not available on CoinCodex, so use 
+    % ETH instead
+    market = 'ethgbp';
 end
 
 return
