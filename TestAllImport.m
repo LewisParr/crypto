@@ -60,114 +60,35 @@ binancemoneyout = moneyout;
 %% Aggregate all transactions
 transactions = [coinbase_transactions; swissborg_transactions; ...
     guarda_transactions; exodus_transactions; nexo_transactions; ...
-    binance_transactions];
+    binanceTransactions];
 transactions = sortrows(transactions,'Timestamp','ascend');
+toassets = unique(transactions.ToAsset);
+feeassets = unique(transactions.FeeAsset);
+fromassets = unique(transactions.FromAsset);
+assets = unique([toassets; feeassets; fromassets]);
+dateLimits = [min(transactions.Timestamp) max(transactions.Timestamp)];
+[y,m,d] = ymd(dateLimits);
+dateLimits = datetime(y,m,d);
 
-%% Compute holdings over time
-% Get a list of all assets
-assets = categorical(sort(string(unique([...
-    unique(transactions.ToAsset);...
-    unique(transactions.FeeAsset);...
-    unique(transactions.FromAsset)]))));
-% Get a list of all transaction dates
-[y,m,d] = ymd(transactions.Timestamp);
-dates = datetime(y,m,d);
-dates.Format = 'dd/MM/yy';
-% Get a vector of all dates
-dates = transpose(min(dates):max(dates));
-% Construct an array of holdings over time
-holdings = zeros(length(dates),length(assets));
-% Collect the item names for each asset symbol
-itemNames = {};
-for a=1:length(assets)
-    itemNames{a} = ItemNamesFromAssetSymbol(assets(a));
-end
-% Keep track of date index
-d = 1;
+% Clean up
+clear toassets feeassets fromassets
 
-% Iterate over days
-for date=min(dates):max(dates)
-    disp(date);
-    
-    % Carry holdings forward
-    if (d~=1)
-        for a=1:length(assets)
-            holdings(d,a) = holdings(d-1,a);
-        end
-    end
-    
-    % today's transactions
-    todayTransactions = transactions(...
-        transactions.Timestamp >= date & ...
-        transactions.Timestamp < (date+1),:);
-    
-    % Iterate over assets
-    for a=1:length(assets)
-        % asset's transactions
-        toTransactions = todayTransactions(todayTransactions.ToAsset==assets(a),:);
-        feeTransactions = todayTransactions(todayTransactions.FeeAsset==assets(a),:);
-        fromTransactions = todayTransactions(todayTransactions.FromAsset==assets(a),:);
-        
-        % to
-        holdings(d,a) = holdings(d,a) + sum(toTransactions.ToQuantity);
-        
-        % fee
-        holdings(d,a) = holdings(d,a) - sum(feeTransactions.FeeQuantity);
-        
-        % from
-        holdings(d,a) = holdings(d,a) - sum(fromTransactions.FromQuantity);
-    end
-    
-    % Prepare for tomorrow
-    d = d + 1;
-end
+%% Calculate holdings over time
+[dates,holdings] = CalcHoldingsOverTime(transactions,assets,dateLimits);
 
-% Clear temporary variables
-clear a d date m y todayTransactions toTransactions feeTransactions ...
-    fromTransactions
+%% Plot holdings over time
+currentholdings = PlotHoldingsOverTime(dates,holdings,assets);
 
 %% Calculate value of holdings over time
-% Construct array of holding value over time
-holdingvalues = zeros(length(dates),length(assets));
-% Keep track of date index
-d = 1;
+holdingvalues = CalcHoldingsValueOverTime(holdings,assets,dateLimits);
 
-% Iterate over assets
-for a=1:length(assets)
-    assetSymbol = assets(a);
-    
-    if (or(assetSymbol=='GBP',assetSymbol=='GBPX'))
-        holdingvalues(:,a) = holdings(:,a);
-    else
-        market = GbpMarketFromAssetSymbol(assetSymbol);
+%% Plot total value of holdings over time
+individual = 1;
+total = 1;
+[currentholdingvalues,currenttotalholdings] = ...
+    PlotHoldingsValueOverTime(holdingvalues,assets,dates,individual,total);
 
-        if (market~="")
-            assetgbp = ReadHistoricalPrice_CoinCodex(market);
-            d = 1;
-
-            % Iterate over dates
-            for date=min(dates):max(dates)
-                priceIndex = find(assetgbp.Date==date);
-
-                if (priceIndex>0)
-                    assetPrice = assetgbp.Close(priceIndex);
-                    if length(assetPrice)>1
-                        assetPrice=assetPrice(1);
-                    end
-                    holdingvalue = assetPrice*holdings(d,a);
-                    holdingvalues(d,a) = holdingvalue;
-                end
-
-                d = d + 1;
-            end
-        else
-            disp('PRICE UNAVAILABLE FOR: ');
-            disp(assetSymbol);
-        end
-    end
-end
-
-%% Plot
+%% Plot holdings across wallets and exchanges
 clf;
 tiledlayout(1, 5);
 

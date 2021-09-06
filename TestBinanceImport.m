@@ -14,19 +14,15 @@ binanceoutput = ImportAllBinanceData();
 
 %% Extract deposit transaction data
 deptransactions = ProcessBinanceDeposits(binanceoutput);
-% Note: have removed using absolute values of binance.Change
 
 %% Extract buy/fee/transaction related/sell data
 exchangetransactions = ProcessBinanceExchanges(binanceoutput);
-% Note: have removed using absolute values of binance.Change
 
 %% Extract reward distribution/POS savings interest/savings interest/launchpool interest
 yieldtransactions = ProcessBinanceYields(binanceoutput);
-% Note: have removed using absolute values of binance.Change
 
 %% Extract commission history transactions
 misctransactions = ProcessBinanceMisc(binanceoutput);
-% Note: have removed using absolute values of binance.Change
 
 %% Unhandled operations:
 % POS savings purchase
@@ -72,3 +68,6 @@ individual = 1;
 total = 1;
 [currentholdingvalues,currenttotalholdings] = ...
     PlotHoldingsValueOverTime(holdingvalues,assets,dates,individual,total);
+
+% Clean up
+clear individual total
