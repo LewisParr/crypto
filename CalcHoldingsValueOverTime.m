@@ -1,5 +1,8 @@
-function holdingvalues = CalcHoldingsValueOverTime(holdings,assets,dateLimits)
+function [dates,holdingvalues] = CalcHoldingsValueOverTime(holdings,assets,dateLimits)
 %CALCHOLDINGSVALUEOVERTIME Summary of this function goes here
+
+% Construct dates vector
+dates = transpose(dateLimits(1):dateLimits(2));
 
 % Construct holdings array
 holdingvalues = zeros(size(holdings));

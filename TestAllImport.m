@@ -12,6 +12,11 @@ coinbasetotalvalue = sum(holdingvalues,2);
 coinbasemoneyin = moneyin;
 coinbasemoneyout = moneyout;
 
+% Clean up
+clear a assetgbp assetPrice assets assetSymbol d date dates holdings ...
+    holdingvalue holdingvalues itemNames market moneyin moneyout ...
+    moneyinamounts moneyintransactions priceIndex transactions_tt
+
 %% Collect swissborg
 TestSwissborgImport;
 swissborgdates = dates;
@@ -20,6 +25,12 @@ swissborgholdingvalues = holdingvalues;
 swissborgtotalvalue = sum(holdingvalues,2);
 swissborgmoneyin = moneyin;
 swissborgmoneyout = moneyout;
+
+% Clean up
+clear a assetGbp assetPrice assets assetSymbol d date dates holdings ...
+    holdingvalue holdingvalues itemNames market moneyin moneyout ...
+    moneyinamounts moneyintransactions moneyoutamounts priceIndex ...
+    moneyouttransactions transactions_tt
 
 %% Collect guarda
 TestGuardaImport;
@@ -30,6 +41,10 @@ guardatotalvalue = sum(holdingvalues,2);
 guardamoneyin = 0;
 guardamoneyout = 0;
 
+% Clean up
+clear a assetgbp assetPrice assets assetSymbol d date dates holdings ...
+    holdingvalue holdingvalues itemNames market priceIndex
+
 %% Collect exodus
 TestExodusImport;
 exodusdates = dates;
@@ -38,6 +53,10 @@ exodusholdingvalues = holdingvalues;
 exodustotalvalue = sum(holdingvalues,2);
 exodusmoneyin = 0;
 exodusmoneyout = 0;
+
+% Clean up
+clear a assetgbp assetPrice assets assetSymbol d date dates holdings ...
+    holdingvalue holdingvalues itemNames market priceIndex
 
 %% Collect nexo
 TestNexoImport;
@@ -48,14 +67,14 @@ nexototalvalue = sum(holdingvalues,2);
 nexomoneyin = moneyin;
 nexomoneyout = moneyout;
 
+% Clean up
+clear assets dates holdings holdingvalues itemNames moneyin moneyout ...
+    transactions_tt transactiontypes 
+
 %% Collect binance;
-TestBinanceImport;
-binancedates = dates;
-binanceholdings = holdings;
-binanceholdingvalues = holdingvalues;
-binancetotalvalue = sum(holdingvalues,2);
-binancemoneyin = moneyin;
-binancemoneyout = moneyout;
+[binancedates,binanceassets,binanceholdings,binanceholdingvalues, ...
+    binanceTransactions,binancemoneyin,binancemoneyout] = ...
+    GetBinanceHoldings();
 
 %% Aggregate all transactions
 transactions = [coinbase_transactions; swissborg_transactions; ...
@@ -71,7 +90,7 @@ dateLimits = [min(transactions.Timestamp) max(transactions.Timestamp)];
 dateLimits = datetime(y,m,d);
 
 % Clean up
-clear toassets feeassets fromassets
+clear toassets feeassets fromassets d m y 
 
 %% Calculate holdings over time
 [dates,holdings] = CalcHoldingsOverTime(transactions,assets,dateLimits);
@@ -80,7 +99,7 @@ clear toassets feeassets fromassets
 currentholdings = PlotHoldingsOverTime(dates,holdings,assets);
 
 %% Calculate value of holdings over time
-holdingvalues = CalcHoldingsValueOverTime(holdings,assets,dateLimits);
+[dates,holdingvalues] = CalcHoldingsValueOverTime(holdings,assets,dateLimits);
 
 %% Plot total value of holdings over time
 individual = 1;
@@ -99,7 +118,7 @@ plot(swissborgdates, swissborgtotalvalue, 'Color', '#70d12b');
 plot(guardadates, guardatotalvalue, 'Color', '#2bbbd1');
 plot(exodusdates, exodustotalvalue, 'Color', '#7e2bd1');
 plot(nexodates, nexototalvalue, 'Color', '#110e60');
-plot(binancedates, binancetotalvalue, 'Color', '#d3c02c');
+plot(binancedates, sum(binanceholdingvalues,2), 'Color', '#d3c02c');
 plot(dates, sum(holdingvalues,2), 'k');
 hold off
 title('Total Holding Value');
