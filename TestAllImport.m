@@ -2,6 +2,10 @@
 clf;
 clear;
 clc;
+addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data');
+addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data\Trading');
+addpath('C:\Users\lparr\Documents\MATLAB\crypto\Binance');
+addpath('C:\Users\lparr\Documents\MATLAB\crypto\Utilities');
 
 %% Collect coinbase
 TestCoinbaseImport;
@@ -27,7 +31,7 @@ swissborgmoneyin = moneyin;
 swissborgmoneyout = moneyout;
 
 % Clean up
-clear a assetGbp assetPrice assets assetSymbol d date dates holdings ...
+clear a assetgbp assetPrice assets assetSymbol d date dates holdings ...
     holdingvalue holdingvalues itemNames market moneyin moneyout ...
     moneyinamounts moneyintransactions moneyoutamounts priceIndex ...
     moneyouttransactions transactions_tt
