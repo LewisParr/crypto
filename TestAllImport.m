@@ -4,6 +4,7 @@ clear;
 clc;
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data');
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data\Trading');
+addpath('C:\Users\lparr\Documents\MATLAB\crypto\Nexo');
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Binance');
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Utilities');
 
@@ -63,17 +64,9 @@ clear a assetgbp assetPrice assets assetSymbol d date dates holdings ...
     holdingvalue holdingvalues itemNames market priceIndex
 
 %% Collect nexo
-TestNexoImport;
-nexodates = dates;
-nexoholdings = holdings;
-nexoholdingvalues = holdingvalues;
-nexototalvalue = sum(holdingvalues,2);
-nexomoneyin = moneyin;
-nexomoneyout = moneyout;
-
-% Clean up
-clear assets dates holdings holdingvalues itemNames moneyin moneyout ...
-    transactions_tt transactiontypes 
+[nexodates,nexoassets,nexoholdings,nexoholdingvalues,nexoTransactions, ...
+    nexomoneyin,nexomoneyout] = ...
+    GetNexoHoldings();
 
 %% Collect binance;
 [binancedates,binanceassets,binanceholdings,binanceholdingvalues, ...
@@ -82,7 +75,7 @@ clear assets dates holdings holdingvalues itemNames moneyin moneyout ...
 
 %% Aggregate all transactions
 transactions = [coinbase_transactions; swissborg_transactions; ...
-    guarda_transactions; exodus_transactions; nexo_transactions; ...
+    guarda_transactions; exodus_transactions; nexoTransactions; ...
     binanceTransactions];
 transactions = sortrows(transactions,'Timestamp','ascend');
 toassets = unique(transactions.ToAsset);
@@ -106,10 +99,13 @@ currentholdings = PlotHoldingsOverTime(dates,holdings,assets);
 [dates,holdingvalues] = CalcHoldingsValueOverTime(holdings,assets,dateLimits);
 
 %% Plot total value of holdings over time
-individual = 1;
-total = 1;
+plotIndividual = 1;
+plotTotal = 1;
 [currentholdingvalues,currenttotalholdings] = ...
-    PlotHoldingsValueOverTime(holdingvalues,assets,dates,individual,total);
+    PlotHoldingsValueOverTime(holdingvalues,assets,dates,plotIndividual,plotTotal);
+
+% Clean up
+clear plotIndividual plotTotal
 
 %% Plot holdings across wallets and exchanges
 clf;
@@ -121,7 +117,7 @@ plot(coinbasedates, coinbasetotalvalue, 'Color', '#2b6dd1');
 plot(swissborgdates, swissborgtotalvalue, 'Color', '#70d12b');
 plot(guardadates, guardatotalvalue, 'Color', '#2bbbd1');
 plot(exodusdates, exodustotalvalue, 'Color', '#7e2bd1');
-plot(nexodates, nexototalvalue, 'Color', '#110e60');
+plot(nexodates, sum(nexoholdingvalues,2), 'Color', '#110e60');
 plot(binancedates, sum(binanceholdingvalues,2), 'Color', '#d3c02c');
 plot(dates, sum(holdingvalues,2), 'k');
 hold off
@@ -166,3 +162,6 @@ set(legend,'location','best');
 xticklabels({'In','Out'});
 ylabel('GBP');
 title('GBP In/Out');
+
+% Clean up
+clear b bls_manual cb cbw_manual e g gem_manual h ledg_manual money n sb 
