@@ -4,6 +4,7 @@ clear;
 clc;
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data');
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data\Trading');
+addpath('C:\Users\lparr\Documents\MATLAB\crypto\Exodus');
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Nexo');
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Binance');
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Utilities');
@@ -51,17 +52,16 @@ clear a assetgbp assetPrice assets assetSymbol d date dates holdings ...
     holdingvalue holdingvalues itemNames market priceIndex
 
 %% Collect exodus
-TestExodusImport;
-exodusdates = dates;
-exodusholdings = holdings;
-exodusholdingvalues = holdingvalues;
-exodustotalvalue = sum(holdingvalues,2);
-exodusmoneyin = 0;
-exodusmoneyout = 0;
-
-% Clean up
-clear a assetgbp assetPrice assets assetSymbol d date dates holdings ...
-    holdingvalue holdingvalues itemNames market priceIndex
+%TestExodusImport;
+%exodusdates = dates;
+%exodusholdings = holdings;
+%exodusholdingvalues = holdingvalues;
+%exodustotalvalue = sum(holdingvalues,2);
+%exodusmoneyin = 0;
+%exodusmoneyout = 0;
+[exodusdates,exodusassets,exodusholdings,exodusholdingvalues, ...
+    exodusTransactions,exodusmoneyin,exodusmoneyout] = ...
+    GetExodusHoldings();
 
 %% Collect nexo
 [nexodates,nexoassets,nexoholdings,nexoholdingvalues,nexoTransactions, ...
@@ -75,7 +75,7 @@ clear a assetgbp assetPrice assets assetSymbol d date dates holdings ...
 
 %% Aggregate all transactions
 transactions = [coinbase_transactions; swissborg_transactions; ...
-    guarda_transactions; exodus_transactions; nexoTransactions; ...
+    guarda_transactions; exodusTransactions; nexoTransactions; ...
     binanceTransactions];
 transactions = sortrows(transactions,'Timestamp','ascend');
 toassets = unique(transactions.ToAsset);
@@ -116,7 +116,7 @@ hold on
 plot(coinbasedates, coinbasetotalvalue, 'Color', '#2b6dd1');
 plot(swissborgdates, swissborgtotalvalue, 'Color', '#70d12b');
 plot(guardadates, guardatotalvalue, 'Color', '#2bbbd1');
-plot(exodusdates, exodustotalvalue, 'Color', '#7e2bd1');
+plot(exodusdates, sum(exodusholdingvalues,2), 'Color', '#7e2bd1');
 plot(nexodates, sum(nexoholdingvalues,2), 'Color', '#110e60');
 plot(binancedates, sum(binanceholdingvalues,2), 'Color', '#d3c02c');
 plot(dates, sum(holdingvalues,2), 'k');

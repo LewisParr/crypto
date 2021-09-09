@@ -1,6 +1,7 @@
 %% Add paths
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data');
 addpath('C:\Users\lparr\Documents\MATLAB\crypto\Data\Trading');
+addpath('C:\Users\lparr\Documents\MATLAB\crypto\Utilities');
 
 %% Import all coinbase files
 coinbaseoutput202101 = ImportCoinbaseOutput('2021','01');
